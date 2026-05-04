@@ -1,1 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salman Alhidamkara | AI Systems Dashboard</title>
+    <style>
+        /* * DESIGN SYSTEM & VARIABLES
+         * Ultra-premium dark theme with gold/cyan accents
+         */
+        :root {
+            --bg-base: #000000;
+            --surface-level-1: #0a0a0a;
+            --surface-level-2: #0f0f0f;
+            --surface-level-3: #1a1a1a;
+            
+            --accent-gold: #d4af37;
+            --accent-gold-glow: rgba(212, 175, 55, 0.15);
+            --accent-cyan: #00c2ff;
+            --accent-cyan-glow: rgba(0, 194, 255, 0.15);
+            
+            --text-primary: #f5f5f5;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-highlight: rgba(255, 255, 255, 0.12);
+            
+            --ease-premium: cubic-bezier(.77,0,.175,1);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
 
+        /* * RESET & BASE STYLES
+         */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* * LAYOUT ARCHITECTURE
+         */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background-color: var(--surface-level-1);
+            border-right: 1px solid var(--border-subtle);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transition: transform 0.4s var(--ease-premium);
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-mark {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--surface-level-3), var(--surface-level-1));
+            border: 1px solid var(--border-highlight);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--accent-gold);
+            box-shadow: 0 0 20px var(--accent-gold-glow);
+        }
+
+        .sidebar-nav {
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s var(--ease-premium);
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: var(--accent-gold);
+            transform: scaleY(0);
+            transition: transform 0.3s var(--ease-premium);
+            transform-origin: center;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background-color: var(--surface-level-2);
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(0.6);
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .nav-item.active svg {
+            stroke: var(--accent-gold);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            position: relative;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            height: 70px;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+            z-index: 40;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--surface-level-2);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .top-profile {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--surface-level-3);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+        }
+
+        /* SECTIONS BASE */
+        .section-container {
+            padding: 6rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: -0.03em;
+        }
+
+        /* * SPECIFIC MODULES 
+         */
+
+        /* Overview / Hero */
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-content h2 {
+            font-size: 1.2rem;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+
+        .power-statement {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            border-left: 2px solid var(--accent-gold);
+            padding-left: 1.5rem;
+            margin-bottom: 3rem;
+            font-weight: 300;
+            line-height: 1.4;
+            background: linear-gradient(90deg, rgba(212,175,55,0.05) 0%, transparent 100%);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Profile Image Upload System */
+        .profile-module {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 16px;
+            animation: float 6s ease-in-out infinite;
+            cursor: pointer;
+            group: profile;
+        }
+
+        .profile-module::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, var(--accent-gold), transparent, var(--accent-cyan));
+            border-radius: 18px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(10px);
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-module:hover::before {
+            opacity: 1;
+            filter: blur(15px);
+        }
+
+        .profile-image-container {
+            width: 100%;
+            height: 100%;
+            background: var(--surface-level-2);
+            border: 1px solid var(--border-highlight);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-placeholder {
+            position: absolute;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+
+        .upload-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .profile-module:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .stat-card {
+            background: var(--surface-level-2);
+            border: 1px solid var(--border-subtle);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--accent-gold);
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Grid Layouts for Cards */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* System Cards (AI Systems & Capabilities) */
+        .system-card {
+            background: var(--surface-level-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s var(--ease-premium);
+        }
+
+        .system-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .system-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-highlight);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0, 194, 255, 0.05);
+            background: var(--surface-level-3);
+        }
+
+        .system-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--surface-level-1);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .system-card h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .system-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background: rgba(0, 255, 102, 0.1);
+            color: #00ff66;
+            border: 1px solid rgba(0, 255, 102, 0.2);
+        }
+        
+        .badge.research { background: rgba(0, 194, 255, 0.1); color: var(--accent-cyan); border-color: rgba(0, 194, 255, 0.2); }
+        .badge.completed { background: rgba(212, 175, 55, 0.1); color: var(--accent-gold); border-color: rgba(212, 175, 55, 0.2); }
+
+        /* Project Modules (SaaS Style) */
+        .project-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2rem;
+            background: var(--surface-level-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s var(--ease-premium);
+        }
+
+        .project-row:hover {
+            background: var(--surface-level-3);
+            border-color: var(--border-highlight);
+            transform: scale(1.01);
+        }
+
+        .project-info h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .tag-list {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        /* Contact / Initialize Panel */
+        .terminal-panel {
+            background: var(--surface-level-1);
+            border: 1px solid var(--border-highlight);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .terminal-header {
+            background: var(--surface-level-2);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .t-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-subtle); }
+        .t-dot:nth-child(1) { background: #ff5f56; }
+        .t-dot:nth-child(2) { background: #ffbd2e; }
+        .t-dot:nth-child(3) { background: #27c93f; }
+
+        .terminal-body {
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .data-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .data-label {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .data-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2.5rem;
+            background: var(--text-primary);
+            color: var(--bg-base);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .cta-button:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* * ANIMATIONS & MICRO-INTERACTIONS 
+         */
+        @keyframes pulse-dot {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s var(--ease-premium);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+
+        /* Mobile Nav Toggle */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* * RESPONSIVE DESIGN
+         */
+        @media (max-width: 1024px) {
+            .hero-layout {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .power-statement {
+                border-left: none;
+                border-bottom: 2px solid var(--accent-gold);
+                padding-left: 0;
+                padding-bottom: 1.5rem;
+                background: linear-gradient(0deg, rgba(212,175,55,0.05) 0%, transparent 100%);
+            }
+            .hero-visual {
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-active {
+                transform: translateX(0);
+                box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .top-bar {
+                padding: 0 1.5rem;
+            }
+            .section-container {
+                padding: 4rem 1.5rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .project-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+            .terminal-body {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- SYSTEM SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-mark">SA</div>
+                <div>
+                    <div style="font-size: 0.9rem; font-weight: 500;">Core System</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">v2.4.0_stable</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-target="overview">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Overview
+                </a>
+                <a href="#ai-systems" class="nav-item" data-target="ai-systems">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    AI Systems
+                </a>
+                <a href="#projects" class="nav-item" data-target="projects">
+                    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    Projects / Modules
+                </a>
+                <a href="#capabilities" class="nav-item" data-target="capabilities">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Capabilities
+                </a>
+                <a href="#contact" class="nav-item" data-target="contact" style="margin-top: auto;">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    Initialize Contact
+                </a>
+            </div>
+        </nav>
+
+        <!-- MAIN ENVIRONMENT -->
+        <main class="main-content">
+            
+            <!-- TOP BAR -->
+            <header class="top-bar">
+                <button class="mobile-toggle" id="mobileMenuBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <div style="flex-grow: 1;"></div>
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="system-status">
+                        <div class="status-dot"></div>
+                        System Online
+                    </div>
+                    <div class="top-profile">
+                        <!-- Small mirror of profile pic -->
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E" id="mini-profile-img" style="width: 100%; height: 100%; object-fit: cover;" alt="user">
+                    </div>
+                </div>
+            </header>
+
+            <!-- 1. OVERVIEW -->
+            <section id="overview" class="section-container">
+                <div class="hero-layout">
+                    <div class="hero-content reveal">
+                        <span class="section-label">System Architect</span>
+                        <h1>Salman Alhidamkara</h1>
+                        <h2>AI-Powered Digital Solutions Developer</h2>
+                        
+                        <div class="power-statement delay-1">
+                            "I design and build real business systems using Artificial Intelligence — not just websites."
+                        </div>
+                        
+                        <div class="stats-grid delay-2">
+                            <div class="stat-card">
+                                <div class="stat-value"><span class="counter" data-target="45">0</span>+</div>
+                                <div class="stat-label">Projects Built</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value"><span class="counter" data-target="12">0</span></div>
+                                <div class="stat-label">Systems Deployed</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value"><span class="counter" data-target="30">0</span>+</div>
+                                <div class="stat-label">Clients Helped</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-visual reveal delay-1">
+                        <!-- Interactive Image Upload Module -->
+                        <label for="profile-upload" class="profile-module">
+                            <div class="profile-image-container">
+                                <div class="profile-placeholder">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 10px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><br>
+                                    NO IMAGE FOUND
+                                </div>
+                                <img id="main-profile-img" src="foto-kamu.png" style="opacity: 0;" alt="Salman Alhidamkara">
+                            </div>
+                            <div class="upload-overlay">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                UPDATE IDENTITY
+                            </div>
+                            <input type="file" id="profile-upload" accept="image/*">
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. AI SYSTEMS -->
+            <section id="ai-systems" class="section-container">
+                <div class="section-header reveal">
+                    <span class="section-label">Core Modules</span>
+                    <h2 class="section-title">AI Systems Architecture</h2>
+                </div>
+
+                <div class="module-grid">
+                    <div class="system-card reveal">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <h3>AI Automation Engine</h3>
+                        <p>Self-regulating workflow scripts that eliminate manual data entry and optimize daily operational bandwidth by up to 80%.</p>
+                        <div class="badge"><div class="status-dot"></div> Active</div>
+                    </div>
+
+                    <div class="system-card reveal delay-1">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </div>
+                        <h3>Smart Workflow Builder</h3>
+                        <p>Logic-driven platform architecture allowing non-technical users to deploy complex, multi-stage digital funnels seamlessly.</p>
+                        <div class="badge"><div class="status-dot"></div> Active</div>
+                    </div>
+
+                    <div class="system-card reveal delay-2">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                        </div>
+                        <h3>Data Processing System</h3>
+                        <p>High-throughput endpoints capable of ingesting unstructured inputs and outputting clean, actionable JSON payloads.</p>
+                        <div class="badge"><div class="status-dot"></div> Active</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. PROJECTS -->
+            <section id="projects" class="section-container">
+                <div class="section-header reveal">
+                    <span class="section-label">Deployment Log</span>
+                    <h2 class="section-title">Production Projects</h2>
+                </div>
+
+                <div class="projects-list">
+                    <!-- Project 1 -->
+                    <div class="project-row reveal">
+                        <div class="project-info">
+                            <h3>QR Attendance System</h3>
+                            <p>Automated tracking architecture with real-time database syncing.</p>
+                            <div class="tag-list" style="margin-top: 0.8rem;">
+                                <span class="tag">Web</span>
+                                <span class="tag">Database</span>
+                                <span class="tag">Hardware Sync</span>
+                            </div>
+                        </div>
+                        <div class="project-meta">
+                            <div class="badge completed">● Live / Completed</div>
+                            <svg width="20" height="20" stroke="var(--text-muted)" fill="none" stroke-width="2" style="cursor: pointer;"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="project-row reveal delay-1">
+                        <div class="project-info">
+                            <h3>Village Website Platform</h3>
+                            <p>Scalable CMS infrastructure tailored for local government transparency and public services.</p>
+                            <div class="tag-list" style="margin-top: 0.8rem;">
+                                <span class="tag">Web</span>
+                                <span class="tag">CMS</span>
+                                <span class="tag">Public Sector</span>
+                            </div>
+                        </div>
+                        <div class="project-meta">
+                            <div class="badge completed">● Live / Completed</div>
+                            <svg width="20" height="20" stroke="var(--text-muted)" fill="none" stroke-width="2" style="cursor: pointer;"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="project-row reveal delay-2">
+                        <div class="project-info">
+                            <h3>Android Security Research</h3>
+                            <p>Vulnerability assessment protocols and automated threat detection vectors for mobile environments.</p>
+                            <div class="tag-list" style="margin-top: 0.8rem;">
+                                <span class="tag">Security</span>
+                                <span class="tag">AI</span>
+                                <span class="tag">Mobile</span>
+                            </div>
+                        </div>
+                        <div class="project-meta">
+                            <div class="badge research">● Research Phase</div>
+                            <svg width="20" height="20" stroke="var(--text-muted)" fill="none" stroke-width="2" style="cursor: pointer;"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. CAPABILITIES -->
+            <section id="capabilities" class="section-container">
+                <div class="section-header reveal">
+                    <span class="section-label">System Specs</span>
+                    <h2 class="section-title">Technical Capabilities</h2>
+                </div>
+
+                <div class="module-grid">
+                    <div class="system-card reveal">
+                        <div class="section-label" style="margin-bottom: 1rem;">Module 01</div>
+                        <h3 style="color: var(--accent-gold);">AI Integration</h3>
+                        <p>Connecting LLMs (GPT, Claude) via API into custom interfaces to automate generation, sorting, and reasoning tasks within legacy systems.</p>
+                    </div>
+
+                    <div class="system-card reveal delay-1">
+                        <div class="section-label" style="margin-bottom: 1rem;">Module 02</div>
+                        <h3 style="color: var(--accent-cyan);">Web Systems</h3>
+                        <p>Full-stack development of resilient, single-page applications and dashboards optimized for minimal latency and high user retention.</p>
+                    </div>
+
+                    <div class="system-card reveal">
+                        <div class="section-label" style="margin-bottom: 1rem;">Module 03</div>
+                        <h3 style="color: var(--text-primary);">Security Awareness</h3>
+                        <p>Implementing strict data validation, CORS policies, and authentication layers to ensure system integrity against external payloads.</p>
+                    </div>
+
+                    <div class="system-card reveal delay-1">
+                        <div class="section-label" style="margin-bottom: 1rem;">Module 04</div>
+                        <h3 style="color: var(--text-primary);">Delivery Execution</h3>
+                        <p>Agile deployment pipelines ensuring rapid prototyping, CI/CD integrations, and zero-downtime version upgrades for live products.</p>
+                    </div>
+                </div>
+                
+                <!-- Trust Metrics -->
+                <div style="margin-top: 4rem;" class="reveal">
+                    <div class="section-label">Historical Analytics</div>
+                    <div style="display: flex; gap: 2rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <div style="border-left: 2px solid var(--accent-cyan); padding-left: 1rem;">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; color: var(--text-primary);"><span class="counter" data-target="20">0</span>+</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Freelance Projects Delivered</div>
+                        </div>
+                        <div style="border-left: 2px solid var(--accent-gold); padding-left: 1rem;">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; color: var(--text-primary);"><span class="counter" data-target="50">0</span>+</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Students Mentored</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. CONTACT -->
+            <section id="contact" class="section-container">
+                <div class="section-header reveal">
+                    <span class="section-label">Port 443</span>
+                    <h2 class="section-title">Establish Connection</h2>
+                </div>
+
+                <div class="terminal-panel reveal delay-1">
+                    <div class="terminal-header">
+                        <div class="t-dot"></div>
+                        <div class="t-dot"></div>
+                        <div class="t-dot"></div>
+                        <span style="margin-left: 1rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">system_request.exe</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div>
+                            <div class="data-group">
+                                <div class="data-label">ENDPOINT_EMAIL</div>
+                                <div class="data-value">salmanalhidamkara666@gmail.com</div>
+                            </div>
+                            <div class="data-group">
+                                <div class="data-label">SECURE_COMM_CHANNEL</div>
+                                <div class="data-value">+62 855 3660 1150</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="data-group">
+                                <div class="data-label">SERVER_LOCATION</div>
+                                <div class="data-value">Indonesia</div>
+                            </div>
+                            <div class="data-group">
+                                <div class="data-label">SYSTEM_STATUS</div>
+                                <div class="data-value" style="color: #00ff66; display: flex; align-items: center; gap: 0.5rem;">
+                                    <div class="status-dot"></div> Open for projects
+                                </div>
+                            </div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <button class="cta-button" onclick="window.location.href='mailto:salmanalhidamkara666@gmail.com?subject=Initialize%20New%20System%20Project'">
+                                [ Initialize Project ]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SYSTEM LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- 1. SMOOTH SCROLL & ACTIVE STATE --- */
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.section-container');
+            
+            // Smooth scroll on click
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    const targetSection = document.getElementById(targetId);
+                    
+                    if (targetSection) {
+                        window.scrollTo({
+                            top: targetSection.offsetTop,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        if (window.innerWidth <= 768) {
+                            document.getElementById('sidebar').classList.remove('mobile-active');
+                        }
+                    }
+                });
+            });
+
+            // Update active state on scroll using Intersection Observer
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -70% 0px',
+                threshold: 0
+            };
+
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navItems.forEach(nav => {
+                            nav.classList.remove('active');
+                            if (nav.getAttribute('data-target') === id) {
+                                nav.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(sec => sectionObserver.observe(sec));
+
+
+            /* --- 2. REVEAL ANIMATIONS --- */
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: stop observing once revealed
+                        // observer.unobserve(entry.target); 
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+
+
+            /* --- 3. ANIMATED COUNTERS --- */
+            const counters = document.querySelectorAll('.counter');
+            let hasAnimated = false;
+
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = parseInt(entry.target.getAttribute('data-target'));
+                        animateValue(entry.target, 0, target, 2000);
+                        counterObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            counters.forEach(counter => counterObserver.observe(counter));
+
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    // Use easeOutExpo for math
+                    const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                    obj.innerHTML = Math.floor(easeProgress * (end - start) + start);
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        obj.innerHTML = end; // Ensure final exact value
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+
+            /* --- 4. PROFILE IMAGE UPLOAD LOGIC --- */
+            const fileInput = document.getElementById('profile-upload');
+            const mainImg = document.getElementById('main-profile-img');
+            const miniImg = document.getElementById('mini-profile-img');
+            const placeholder = document.querySelector('.profile-placeholder');
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        const imgData = event.target.result;
+                        // Set image sources
+                        mainImg.src = imgData;
+                        miniImg.src = imgData;
+                        
+                        // UI Updates
+                        mainImg.style.opacity = '1';
+                        placeholder.style.display = 'none';
+                        
+                        // Add a slight glow effect indicating successful load
+                        document.querySelector('.profile-module').style.boxShadow = '0 0 40px rgba(212, 175, 55, 0.3)';
+                        setTimeout(() => {
+                            document.querySelector('.profile-module').style.boxShadow = 'none';
+                        }, 1000);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+
+
+            /* --- 5. MOBILE MENU TOGGLE --- */
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-active');
+            });
+
+        });
+    </script>
+</body>
+  </html>
